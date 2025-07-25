@@ -1,0 +1,96 @@
+
+# ASP.NET Core Command Line Interface (.NET Core CLI)
+
+The .NET Core CLI (Command Line Interface) is a cross-platform toolchain for developing, building, running, and publishing .NET applications from the terminal or command prompt.
+
+---
+
+## 🔧 Prerequisites
+
+- [.NET SDK](https://dotnet.microsoft.com/download) installed on your machine
+- Terminal / Command Prompt access
+
+---
+
+## 📋 Common CLI Commands
+
+### 🔹 Project Management
+
+| Command                              | Description                                      |
+|--------------------------------------|--------------------------------------------------|
+| `dotnet new`                         | Lists available templates                        |
+| `dotnet new mvc -n ProjectName`      | Creates a new ASP.NET Core MVC project           |
+| `dotnet new webapi -n ProjectName`   | Creates a new Web API project                    |
+| `dotnet new razor -n ProjectName`    | Creates a Razor Pages project                    |
+| `dotnet new console -n ProjectName`  | Creates a Console app                            |
+
+---
+
+### 🔹 Build & Run
+
+| Command                 | Description                                |
+|-------------------------|--------------------------------------------|
+| `dotnet build`          | Builds the application                     |
+| `dotnet run`            | Runs the application                       |
+| `dotnet clean`          | Cleans output of previous builds           |
+
+---
+
+### 🔹 Dependency Management
+
+| Command                          | Description                                 |
+|----------------------------------|---------------------------------------------|
+| `dotnet add package <Package>`   | Adds a NuGet package                        |
+| `dotnet restore`                 | Restores project dependencies               |
+| `dotnet list package`            | Lists installed packages                    |
+
+---
+
+### 🔹 Project & Solution
+
+| Command                                   | Description                                  |
+|-------------------------------------------|----------------------------------------------|
+| `dotnet new sln -n MySolution`            | Creates a new solution file                  |
+| `dotnet sln add ProjectName/Project.csproj` | Adds a project to the solution               |
+
+---
+
+### 🔹 Publishing
+
+| Command                                        | Description                                       |
+|------------------------------------------------|---------------------------------------------------|
+| `dotnet publish -c Release -o ./publish`       | Publishes the application to a folder             |
+| `dotnet publish --runtime win-x64`             | Publishes for a specific runtime (self-contained) |
+
+---
+
+## 🔍 Helpful Flags
+
+| Flag               | Description                           |
+|--------------------|---------------------------------------|
+| `-n` or `--name`   | Specifies the project name            |
+| `-o` or `--output` | Output location for generated files   |
+| `-c` or `--configuration` | Build configuration (`Debug`, `Release`) |
+
+---
+
+## 📘 Example: Create and Run a Web API
+
+```bash
+dotnet new webapi -n MyApi
+cd MyApi
+dotnet run
+```
+
+Access the API at: `https://localhost:5001` or `http://localhost:5000`
+
+---
+
+## 🌐 Resources
+
+- [Official .NET CLI Docs](https://learn.microsoft.com/en-us/dotnet/core/tools/)
+- [Template Reference](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-new)
+
+---
+
+> ✅ Tip: Use `dotnet --help` or `dotnet <command> --help` for detailed command usage.
