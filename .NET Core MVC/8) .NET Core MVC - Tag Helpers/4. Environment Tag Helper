@@ -1,0 +1,81 @@
+# ✅ <environment> Tag Helper in ASP.NET Core MVC
+
+The `<environment>` Tag Helper in **ASP.NET Core MVC** is used to conditionally render HTML based on the current hosting environment (`Development`, `Staging`, `Production`, etc.).
+
+---
+
+## 📌 Syntax
+
+```html
+<environment include="Development">
+    <!-- Content here will only render in Development -->
+</environment>
+
+<environment exclude="Development">
+    <!-- Content here will render in all environments except Development -->
+</environment>
+```
+
+---
+
+## 🎯 Common Use Case: Load Different CSS/JS
+
+```html
+<!-- In _Layout.cshtml -->
+
+<environment include="Development">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+</environment>
+
+<environment exclude="Development">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+</environment>
+```
+
+---
+
+## ⚙️ Multiple Environments
+
+Include or exclude multiple environments by separating them with commas:
+
+```html
+<environment include="Development,Staging">
+    <script>alert('You are in Dev or Staging');</script>
+</environment>
+```
+
+---
+
+## 🧩 Configure the Environment
+
+Environment is typically set in:
+
+### ✅ launchSettings.json (for Development)
+
+```json
+"profiles": {
+  "IIS Express": {
+    "environmentVariables": {
+      "ASPNETCORE_ENVIRONMENT": "Development"
+    }
+  }
+}
+```
+
+### ✅ On Production Server
+
+Set the environment variable manually:
+
+```
+ASPNETCORE_ENVIRONMENT=Production
+```
+
+---
+
+## 📝 Notes
+
+- Works only in `.cshtml` Razor views.
+- It's a built-in Tag Helper—no extra configuration needed.
+- Helps with separating dev-specific or production-specific assets.
