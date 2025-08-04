@@ -1,0 +1,108 @@
+# ✅ View Component Tag Helper in ASP.NET Core MVC
+
+The **View Component Tag Helper** lets you invoke View Components in a Razor view using a clean, HTML-like syntax.
+
+---
+
+## 📌 Syntax
+
+```html
+<vc:ComponentName param1="value1" param2="value2"></vc:ComponentName>
+```
+
+- `ComponentName`: Derived from the ViewComponent class name.
+- Parameters: Passed to the `Invoke` or `InvokeAsync` method.
+
+---
+
+## 🎯 Example: Menu View Component
+
+### 1. ✅ Create the View Component
+
+```csharp
+public class MenuViewComponent : ViewComponent
+{
+    public IViewComponentResult Invoke(string category)
+    {
+        var items = GetMenuItems(category);
+        return View(items);
+    }
+
+    private List<string> GetMenuItems(string category)
+    {
+        return category == "drinks"
+            ? new List<string> { "Tea", "Coffee", "Juice" }
+            : new List<string> { "Pizza", "Burger", "Pasta" };
+    }
+}
+```
+
+---
+
+### 2. ✅ Create the View for the Component
+
+📁 Path: `Views/Shared/Components/Menu/Default.cshtml`
+
+```html
+@model List<string>
+
+<ul>
+@foreach (var item in Model)
+{
+    <li>@item</li>
+}
+</ul>
+```
+
+---
+
+### 3. ✅ Use the View Component Tag Helper in Razor View
+
+```html
+<vc:menu category="drinks"></vc:menu>
+```
+
+Renders a menu for the "drinks" category.
+
+---
+
+## 📋 Naming Convention
+
+| Class Name                     | Tag Syntax          |
+|-------------------------------|---------------------|
+| `MenuViewComponent`           | `<vc:menu>`         |
+| `ProductListViewComponent`    | `<vc:product-list>` |
+
+- PascalCase → kebab-case (automatically handled)
+- Always prefixed with `vc:`
+
+---
+
+## 📝 Notes
+
+- You can also use the C# syntax:
+
+```csharp
+@await Component.InvokeAsync("Menu", new { category = "drinks" })
+```
+
+- But `<vc:menu>` is more readable and concise.
+
+---
+
+## 💡 When to Use View Components
+
+- Navigation menus
+- Mini cart widgets
+- User profile panels
+- Dynamic sidebars
+- Footer content
+- Any reusable UI with business logic
+
+---
+
+## 🔧 Advantages
+
+- Encapsulation of logic and view
+- Promotes reuse and cleaner views
+- Easier testing and maintenance
