@@ -1,0 +1,73 @@
+# ✅ HTML Helpers vs Tag Helpers in ASP.NET Core MVC
+
+In ASP.NET Core MVC, both **HTML Helpers** and **Tag Helpers** are used to render UI elements in Razor views. Here's a detailed comparison between them.
+
+---
+
+## 📊 Comparison Table
+
+| Feature                     | HTML Helpers                              | Tag Helpers                                     |
+|----------------------------|-------------------------------------------|-------------------------------------------------|
+| **Syntax**                 | C# method calls in Razor (`@Html.TextBox`) | HTML-like syntax (`<input asp-for="...">`)     |
+| **Readability**            | Less intuitive, more C#-centric            | Clean and readable for frontend developers     |
+| **IntelliSense Support**   | Limited                                    | Full IntelliSense in Razor + HTML editors      |
+| **Design-time Support**    | Limited                                    | Full support in Visual Studio and other IDEs   |
+| **Customization**          | More complex                               | Easily customizable with custom Tag Helpers    |
+| **Binding Support**        | Manual                                     | Automatic via `asp-for`, `asp-action`, etc.    |
+| **Client-side Integration**| Less seamless                              | More HTML5- and JS-friendly                    |
+| **Use Case**               | Legacy or server-side logic heavy          | Modern ASP.NET Core development                |
+
+---
+
+## 🎯 Example Comparison
+
+### ✅ HTML Helper Example
+
+```csharp
+@Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+```
+
+### ✅ Tag Helper Example
+
+```html
+<input asp-for="Email" class="form-control" />
+```
+
+---
+
+## 🧠 When to Use What?
+
+- ✅ **Use Tag Helpers** for new ASP.NET Core MVC projects.
+- ☑️ **Use HTML Helpers** when maintaining older ASP.NET MVC projects or requiring dynamic logic in C#.
+
+---
+
+## 🛠️ Common HTML Helpers
+
+| Helper                 | Description                      |
+|------------------------|----------------------------------|
+| `Html.TextBoxFor`      | Renders an `<input type="text">` |
+| `Html.LabelFor`        | Renders a `<label>`              |
+| `Html.DropDownListFor` | Renders a `<select>` dropdown    |
+| `Html.EditorFor`       | Renders appropriate input based on type |
+
+---
+
+## 🧩 Common Tag Helpers
+
+| Tag Helper Attribute | Purpose                             |
+|----------------------|-------------------------------------|
+| `asp-for`            | Binds to a model property           |
+| `asp-controller`     | Sets controller name in `<a>/<form>` |
+| `asp-action`         | Sets action name                    |
+| `asp-route-*`        | Adds route values to links/forms    |
+
+---
+
+## 💡 Recommendation
+
+- ✅ Prefer **Tag Helpers** for modern ASP.NET Core MVC development.
+- 🔄 Use **HTML Helpers** for compatibility with older MVC projects.
+
+---
+
