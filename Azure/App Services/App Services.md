@@ -184,171 +184,169 @@ Deployment slots allow you to deploy new versions **without downtime**.
 
 ---
 
-10. Security Features (AZ-204 EXAM CRITICAL)
+## 10. Security Features (AZ-204 EXAM CRITICAL)
 
-Security is a high‑weight area in AZ‑204. You must clearly understand Authentication & Authorization (Easy Auth) and Managed Identity, how they work, and when to use each.
+Security is a **high‑weight area** in AZ‑204. You must clearly understand **Authentication & Authorization (Easy Auth)** and **Managed Identity**, how they work, and when to use each.
 
-10.1 Authentication & Authorization (Easy Auth)
+---
 
-Azure App Service provides built‑in authentication and authorization, commonly called Easy Auth. It allows you to secure your application without writing authentication code.
+### 10.1 Authentication & Authorization (Easy Auth)
 
-What Easy Auth Does
+Azure App Service provides **built‑in authentication and authorization**, commonly called **Easy Auth**. It allows you to secure your application **without writing authentication code**.
 
-Handles user sign‑in
+#### What Easy Auth Does
 
-Validates tokens
+* Handles user sign‑in
+* Validates tokens
+* Manages identity sessions
+* Injects identity information into requests
 
-Manages identity sessions
+> Your application focuses on **business logic**, while App Service handles authentication.
 
-Injects identity information into requests
+---
 
-Your application focuses on business logic, while App Service handles authentication.
-
-Supported Identity Providers
+#### Supported Identity Providers
 
 Easy Auth supports the following providers (commonly tested in AZ‑204):
 
-Azure Active Directory (Azure AD) – enterprise identity provider
+* **Azure Active Directory (Azure AD)** – enterprise identity provider
+* **Microsoft Account** – consumer Microsoft identities
+* **Google** – OAuth 2.0 based authentication
+* **Facebook** – OAuth based authentication
 
-Microsoft Account – consumer Microsoft identities
+---
 
-Google – OAuth 2.0 based authentication
+#### Authentication Flow (Conceptual)
 
-Facebook – OAuth based authentication
+1. User accesses the App Service URL
+2. App Service redirects user to the identity provider
+3. Provider authenticates the user
+4. Provider issues a token (JWT)
+5. App Service validates the token
+6. Request is forwarded to the app with identity headers
 
-Authentication Flow (Conceptual)
+---
 
-User accesses the App Service URL
-
-App Service redirects user to the identity provider
-
-Provider authenticates the user
-
-Provider issues a token (JWT)
-
-App Service validates the token
-
-Request is forwarded to the app with identity headers
-
-Authorization Options
+#### Authorization Options
 
 Easy Auth supports multiple authorization behaviors:
 
-Allow anonymous requests (optional authentication)
+* **Allow anonymous requests** (optional authentication)
+* **Require authentication** for all requests
+* **Restrict access** to specific users or Azure AD groups
 
-Require authentication for all requests
+---
 
-Restrict access to specific users or Azure AD groups
-
-Identity Information in the App
+#### Identity Information in the App
 
 After authentication, identity data is available via:
 
-HTTP headers (e.g., X-MS-CLIENT-PRINCIPAL)
-
-Environment variables
-
-Platform SDKs
+* HTTP headers (e.g., `X-MS-CLIENT-PRINCIPAL`)
+* Environment variables
+* Platform SDKs
 
 This allows role‑based logic inside the application.
 
-AZ‑204 Exam Notes – Easy Auth
+---
 
-No code required for authentication
+#### AZ‑204 Exam Notes – Easy Auth
 
-Works at the platform level, before your app executes
+* No code required for authentication
+* Works at the **platform level**, before your app executes
+* Common scenario: *“Secure an App Service quickly using Azure AD”*
 
-Common scenario: “Secure an App Service quickly using Azure AD”
+---
 
-10.2 Managed Identity (EXAM FAVORITE)
+### 10.2 Managed Identity (EXAM FAVORITE)
 
-Managed Identity is used for service‑to‑service authentication, not user authentication.
+Managed Identity is used for **service‑to‑service authentication**, not user authentication.
 
-It allows an App Service to securely access Azure resources without storing secrets, keys, or passwords in code.
+It allows an App Service to **securely access Azure resources without storing secrets, keys, or passwords in code**.
 
-Types of Managed Identity
-1. System‑Assigned Managed Identity
+---
 
-Enabled directly on the App Service
+#### Types of Managed Identity
 
-Identity lifecycle is tied to the App Service
+##### 1. System‑Assigned Managed Identity
 
-Deleted automatically when the app is deleted
+* Enabled directly on the App Service
+* Identity lifecycle is tied to the App Service
+* Deleted automatically when the app is deleted
 
-2. User‑Assigned Managed Identity
+##### 2. User‑Assigned Managed Identity
 
-Created as a standalone Azure resource
+* Created as a standalone Azure resource
+* Can be shared across multiple services
+* Lifecycle managed independently
 
-Can be shared across multiple services
+---
 
-Lifecycle managed independently
+#### How Managed Identity Works
 
-How Managed Identity Works
+1. Azure creates an identity in Azure AD
+2. App Service obtains a token from Azure AD at runtime
+3. Token is used to access Azure services
+4. No credentials are stored in code or configuration
 
-Azure creates an identity in Azure AD
+---
 
-App Service obtains a token from Azure AD at runtime
-
-Token is used to access Azure services
-
-No credentials are stored in code or configuration
-
-Secure Access to Azure Resources
+#### Secure Access to Azure Resources
 
 Managed Identity is commonly used to access:
 
-Azure SQL Database – using Azure AD authentication
+* **Azure SQL Database** – using Azure AD authentication
+* **Azure Key Vault** – retrieve secrets, keys, certificates
+* **Azure Storage Accounts** – Blob, Queue, Table access
 
-Azure Key Vault – retrieve secrets, keys, certificates
+Access is granted using **Azure RBAC** or **Key Vault access policies**.
 
-Azure Storage Accounts – Blob, Queue, Table access
+---
 
-Access is granted using Azure RBAC or Key Vault access policies.
+#### Example – Managed Identity with Key Vault (Conceptual)
 
-Example – Managed Identity with Key Vault (Conceptual)
+* App Service has Managed Identity enabled
+* Identity is granted `Get` permission on Key Vault secrets
+* App retrieves secret at runtime using Azure SDK
+* No connection strings or secrets stored in code
 
-App Service has Managed Identity enabled
+---
 
-Identity is granted Get permission on Key Vault secrets
-
-App retrieves secret at runtime using Azure SDK
-
-No connection strings or secrets stored in code
-
-Why “No Secrets in Code” Is Critical
+#### Why “No Secrets in Code” Is Critical
 
 Without Managed Identity:
 
-Secrets stored in appsettings.json
-
-Keys exposed in pipelines or repositories
-
-Manual rotation required
+* Secrets stored in `appsettings.json`
+* Keys exposed in pipelines or repositories
+* Manual rotation required
 
 With Managed Identity:
 
-Secrets are never stored
+* Secrets are never stored
+* Automatic token rotation
+* Strong security posture (exam favorite)
 
-Automatic token rotation
+---
 
-Strong security posture (exam favorite)
+### 10.3 Easy Auth vs Managed Identity (EXAM COMPARISON)
 
-10.3 Easy Auth vs Managed Identity (EXAM COMPARISON)
-Feature	Easy Auth	Managed Identity
-Purpose	User authentication	Service authentication
-Used for	Login & access control	Access Azure resources
-Works with	Users	Azure services
-Stores secrets	No	No
-Exam usage	Secure app endpoints	Secure backend access
-10.4 AZ‑204 Common Security Scenarios
+| Feature        | Easy Auth              | Managed Identity       |
+| -------------- | ---------------------- | ---------------------- |
+| Purpose        | User authentication    | Service authentication |
+| Used for       | Login & access control | Access Azure resources |
+| Works with     | Users                  | Azure services         |
+| Stores secrets | No                     | No                     |
+| Exam usage     | Secure app endpoints   | Secure backend access  |
 
-Secure web app login → Easy Auth + Azure AD
+---
 
-Access Key Vault securely → Managed Identity
+### 10.4 AZ‑204 Common Security Scenarios
 
-Remove secrets from config → Managed Identity
+* Secure web app login → **Easy Auth + Azure AD**
+* Access Key Vault securely → **Managed Identity**
+* Remove secrets from config → **Managed Identity**
+* Authenticate users quickly without code → **Easy Auth**
 
-Authenticate users quickly without code → Easy Auth
+---
 
 ## 11. Networking Capabilities
 
