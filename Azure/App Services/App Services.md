@@ -85,14 +85,17 @@ An **App Service Plan** defines the **compute resources** used by one or more Ap
 
 ## 5. App Service Plan Pricing Tiers
 
-| Tier             | Use Case                  |
-| ---------------- | ------------------------- |
-| Free (F1)        | Learning & testing        |
-| Shared (D1)      | Low traffic apps          |
-| Basic (B1–B3)    | Dev/Test                  |
-| Standard (S1–S3) | Production                |
-| Premium (P1–P3)  | High scale                |
-| Isolated (ASE)   | Enterprise, VNet isolated |
+| Feature / Tier            | Free            | Shared            | Basic              | Standard            | Premium              | Isolated                 |
+|---------------------------|-----------------|-------------------|--------------------|---------------------|----------------------|--------------------------|
+| **Intended Use**          | Try for free    | Dev/Test          | Dev/Test           | Production          | High performance     | Enterprise isolation     |
+| **Web, Mobile, API Apps** | 10              | 100               | Unlimited          | Unlimited           | Unlimited            | Unlimited                |
+| **Disk Space**            | 1 GB            | 1 GB              | 10 GB              | 50 GB               | 250 GB               | 1 TB                     |
+| **Maximum Instances**     | –               | –                 | Up to 3            | Up to 10            | Up to 20             | Up to 100+               |
+| **Custom Domain**         | Not supported   | Supported         | Supported          | Supported           | Supported            | Supported                |
+| **Auto Scale**            | Not supported   | Not supported     | Not supported      | Supported           | Supported            | Supported                |
+| **VPN / Hybrid Connectivity** | Not supported | Not supported     | Not supported      | Supported           | Supported            | Supported                |
+| **Network Isolation**     | Not supported   | Not supported     | Not supported      | Not supported       | Not supported        | Supported                |
+
 
 ```
 Exam Rule:
