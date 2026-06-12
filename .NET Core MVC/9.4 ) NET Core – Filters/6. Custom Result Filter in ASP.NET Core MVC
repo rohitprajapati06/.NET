@@ -1,0 +1,523 @@
+# Custom Result Filter in ASP.NET Core MVC
+
+A **Custom Result Filter** is a user-defined filter that executes **before and/or after an action result is executed**. It allows you to modify the response, add headers, log information, inject data into views, or replace the result entirely.
+
+Result filters work with the execution of:
+
+* `ViewResult`
+* `JsonResult`
+* `ContentResult`
+* `RedirectResult`
+* Other MVC action results
+
+---
+
+# Why Use a Custom Result Filter?
+
+Common scenarios include:
+
+* Adding custom HTTP headers
+* Logging response details
+* Auditing requests
+* Injecting common ViewData
+* Modifying action results
+* Adding security headers
+
+Instead of writing the same code in every action:
+
+```csharp
+Response.Headers.Add("Application", "TourNest");
+```
+
+You can centralize it in a custom filter.
+
+---
+
+# Creating a Custom Result Filter
+
+Implement the `IResultFilter` interface.
+
+```csharp
+using Microsoft.AspNetCore.Mvc.Filters;
+
+public class CustomResultFilter : IResultFilter
+{
+    public void OnResultExecuting(ResultExecutingContext context)
+    {
+        Console.WriteLine("Before Result Execution");
+    }
+
+    public void OnResultExecuted(ResultExecutedContext context)
+    {
+        Console.WriteLine("After Result Execution");
+    }
+}
+```
+
+---
+
+# Understanding the Methods
+
+## OnResultExecuting()
+
+Runs before the result is executed.
+
+```csharp
+public void OnResultExecuting(ResultExecutingContext context)
+{
+}
+```
+
+Typical uses:
+
+* Add response headers
+* Modify ViewData
+* Replace the result
+
+---
+
+## OnResultExecuted()
+
+Runs after the result executes.
+
+```csharp
+public void OnResultExecuted(ResultExecutedContext context)
+{
+}
+```
+
+Typical uses:
+
+* Logging
+* Auditing
+* Performance measurement
+
+---
+
+# Example 1: Adding Custom Headers
+
+```csharp
+using Microsoft.AspNetCore.Mvc.Filters;
+
+public class HeaderResultFilter : IResultFilter
+{
+    public void OnResultExecuting(ResultExecutingContext context)
+    {
+        context.HttpContext.Response.Headers.Add(
+            "Application",
+            "TourNest");
+    }
+
+    public void OnResultExecuted(ResultExecutedContext context)
+    {
+    }
+}
+```
+
+### Response Header
+
+```http
+Application: TourNest
+```
+
+---
+
+# Example 2: Logging Response Details
+
+```csharp
+using Microsoft.AspNetCore.Mvc.Filters;
+
+public class LoggingResultFilter : IResultFilter
+{
+    private readonly ILogger<LoggingResultFilter> _logger;
+
+    public LoggingResultFilter(
+        ILogger<LoggingResultFilter> logger)
+    {
+        _logger = logger;
+    }
+
+    public void OnResultExecuting(ResultExecutingContext context)
+    {
+        _logger.LogInformation(
+            "Result execution started.");
+    }
+
+    public void OnResultExecuted(ResultExecutedContext context)
+    {
+        _logger.LogInformation(
+            $"Response Status Code: " +
+            $"{context.HttpContext.Response.StatusCode}");
+    }
+}
+```
+
+---
+
+# Example 3: Injecting ViewData
+
+Suppose every view should display the company name.
+
+### Filter
+
+```csharp
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+
+public class CompanyFilter : IResultFilter
+{
+    public void OnResultExecuting(ResultExecutingContext context)
+    {
+        if (context.Controller is Controller controller)
+        {
+            controller.ViewData["Company"] =
+                "La Caffeine";
+        }
+    }
+
+    public void OnResultExecuted(ResultExecutedContext context)
+    {
+    }
+}
+```
+
+### View
+
+```html
+<h3>@ViewData["Company"]</h3>
+```
+
+### Output
+
+```text
+La Caffeine
+```
+
+---
+
+# Example 4: Replacing a Result
+
+Redirect unauthorized users automatically.
+
+```csharp
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+
+public class RedirectUnauthorizedFilter
+    : IResultFilter
+{
+    public void OnResultExecuting(
+        ResultExecutingContext context)
+    {
+        if (context.Result is UnauthorizedResult)
+        {
+            context.Result =
+                new RedirectToActionResult(
+                    "Login",
+                    "Account",
+                    null);
+        }
+    }
+
+    public void OnResultExecuted(
+        ResultExecutedContext context)
+    {
+    }
+}
+```
+
+---
+
+# Async Custom Result Filter
+
+For asynchronous operations, implement `IAsyncResultFilter`.
+
+```csharp
+using Microsoft.AspNetCore.Mvc.Filters;
+
+public class AsyncResultFilter : IAsyncResultFilter
+{
+    public async Task OnResultExecutionAsync(
+        ResultExecutingContext context,
+        ResultExecutionDelegate next)
+    {
+        Console.WriteLine("Before Result");
+
+        await next();
+
+        Console.WriteLine("After Result");
+    }
+}
+```
+
+---
+
+# Using ResultFilterAttribute
+
+Instead of implementing `IResultFilter`, inherit from `ResultFilterAttribute`.
+
+```csharp
+using Microsoft.AspNetCore.Mvc.Filters;
+
+public class CustomHeaderAttribute
+    : ResultFilterAttribute
+{
+    public override void OnResultExecuting(
+        ResultExecutingContext context)
+    {
+        context.HttpContext.Response.Headers.Add(
+            "Company",
+            "TourNest");
+    }
+}
+```
+
+Apply directly:
+
+```csharp
+[CustomHeader]
+public IActionResult Index()
+{
+    return View();
+}
+```
+
+---
+
+# Registering Custom Result Filters
+
+## Action Level
+
+```csharp
+[ServiceFilter(typeof(HeaderResultFilter))]
+public IActionResult Index()
+{
+    return View();
+}
+```
+
+---
+
+## Controller Level
+
+```csharp
+[ServiceFilter(typeof(HeaderResultFilter))]
+public class ProductController : Controller
+{
+}
+```
+
+Applies to all actions in the controller.
+
+---
+
+## Global Level
+
+### Register Service
+
+```csharp
+builder.Services.AddScoped<HeaderResultFilter>();
+```
+
+### Add Globally
+
+```csharp
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<HeaderResultFilter>();
+});
+```
+
+Applies to every controller and action.
+
+---
+
+# Result Filter Execution Flow
+
+Consider this action:
+
+```csharp
+public IActionResult Index()
+{
+    return View();
+}
+```
+
+Pipeline:
+
+```text
+Request
+   │
+   ▼
+Action Method Executes
+   │
+   ▼
+OnResultExecuting()
+   │
+   ▼
+View Rendering
+   │
+   ▼
+OnResultExecuted()
+   │
+   ▼
+Response Sent
+```
+
+---
+
+# Real-World Example: Security Headers
+
+A common enterprise use case.
+
+```csharp
+public class SecurityHeaderFilter
+    : ResultFilterAttribute
+{
+    public override void OnResultExecuting(
+        ResultExecutingContext context)
+    {
+        var headers =
+            context.HttpContext.Response.Headers;
+
+        headers.Add("X-Frame-Options", "DENY");
+        headers.Add("X-Content-Type-Options", "nosniff");
+        headers.Add("Referrer-Policy", "strict-origin");
+    }
+}
+```
+
+This helps protect against:
+
+* Clickjacking
+* MIME-type sniffing
+* Referrer leakage
+
+---
+
+# Result Filter vs Action Filter
+
+| Feature                  | Action Filter | Result Filter |
+| ------------------------ | ------------- | ------------- |
+| Runs Before Action       | Yes           | No            |
+| Runs After Action        | Yes           | No            |
+| Runs Before Result       | No            | Yes           |
+| Runs After Result        | No            | Yes           |
+| Access Action Parameters | Yes           | No            |
+| Modify Response          | Limited       | Yes           |
+
+---
+
+# Result Filter vs Middleware
+
+| Feature                    | Result Filter          | Middleware                       |
+| -------------------------- | ---------------------- | -------------------------------- |
+| MVC-Specific               | Yes                    | No                               |
+| Access Controller/ViewData | Yes                    | No                               |
+| Works for Entire App       | No                     | Yes                              |
+| Best Use Case              | Response customization | Global request/response handling |
+
+---
+
+# Best Practices
+
+### Use Result Filters For
+
+✅ Response headers
+
+✅ ViewData injection
+
+✅ Response auditing
+
+✅ Response customization
+
+✅ MVC-specific response logic
+
+### Use Middleware For
+
+✅ Global logging
+
+✅ Authentication
+
+✅ Global exception handling
+
+✅ Request/response processing for the entire application
+
+---
+
+# Interview Questions
+
+### What is a Custom Result Filter?
+
+A Custom Result Filter is a filter that executes before and after an action result is executed and allows modification of the response.
+
+---
+
+### Which interfaces can be used to create a Result Filter?
+
+```csharp
+IResultFilter
+```
+
+or
+
+```csharp
+IAsyncResultFilter
+```
+
+---
+
+### When does a Result Filter execute?
+
+It executes around the execution of an action result, after the action method has completed.
+
+---
+
+### Can a Result Filter modify HTTP headers?
+
+Yes.
+
+Example:
+
+```csharp
+context.HttpContext.Response.Headers.Add(
+    "Application",
+    "TourNest");
+```
+
+---
+
+### What is preferred for adding application-wide security headers?
+
+For MVC-specific scenarios, a **Result Filter** works well. For application-wide response processing, **Middleware** is generally preferred.
+
+---
+
+## Enterprise ASP.NET Core Example
+
+In projects like **TourNest**, **SmartHealthcare**, and **La Caffeine**, custom result filters are commonly used for:
+
+```text
+✔ Security Headers
+✔ Response Auditing
+✔ Response Logging
+✔ ViewData Injection
+✔ Custom Response Metadata
+✔ Tenant-Specific Response Customization
+```
+
+A common architecture is:
+
+```text
+Middleware
+    ↓
+Controllers
+    ↓
+Action Filters
+    ↓
+Result Filters
+    ↓
+Response
+```
+
+where Result Filters handle MVC-specific response customization while Middleware handles application-wide concerns.
