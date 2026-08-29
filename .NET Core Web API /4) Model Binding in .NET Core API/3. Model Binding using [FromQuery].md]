@@ -1,0 +1,84 @@
+## `[FromQuery]` in ASP.NET Core
+
+`[FromQuery]` is a **model binding attribute** used to get values from the **query string** of an HTTP request.
+
+### Example
+
+Request:
+
+```http
+GET /api/patients?name=Rohit&age=25
+```
+
+Controller:
+
+```csharp
+[HttpGet]
+public IActionResult GetPatients(
+    [FromQuery] string name,
+    [FromQuery] int age)
+{
+    return Ok(new { name, age });
+}
+```
+
+ASP.NET Core automatically binds:
+
+```text
+name → "Rohit"
+age  → 25
+```
+
+### Common use cases
+
+`[FromQuery]` is mainly used for:
+
+* **Filtering** → `?status=Active`
+* **Searching** → `?name=Rohit`
+* **Pagination** → `?page=1&pageSize=10`
+* **Sorting** → `?sortBy=name`
+
+### Using a DTO
+
+When there are multiple query parameters, use a model:
+
+```csharp
+public class PatientQuery
+{
+    public string? Search { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+}
+```
+
+```csharp
+[HttpGet]
+public IActionResult GetPatients([FromQuery] PatientQuery query)
+{
+    // query.Search
+    // query.Page
+    // query.PageSize
+}
+```
+
+Request:
+
+```http
+GET /api/patients?search=Rohit&page=2&pageSize=20
+```
+
+### `[FromQuery]` vs `[FromRoute]`
+
+```text
+/api/patients/10
+              ↑
+          [FromRoute]
+
+/api/patients?id=10
+              ↑
+          [FromQuery]
+```
+
+**Interview definition:**
+
+> `[FromQuery]` tells ASP.NET Core to bind a parameter or model property from the query string of the HTTP request. It is commonly used for filtering, searching, sorting, and pagination.
