@@ -1,0 +1,77 @@
+# Response Caching in ASP.NET Core Web API
+
+**Response Caching** stores the **HTTP response** so that subsequent requests can be served without executing the controller/action again.
+
+It is useful for data that **doesn't change frequently**.
+
+### 1. Configure Response Caching
+
+In `Program.cs`:
+
+```csharp
+builder.Services.AddResponseCaching();
+
+var app = builder.Build();
+
+app.UseResponseCaching();
+```
+
+### 2. Apply `[ResponseCache]`
+
+```csharp
+[HttpGet]
+[ResponseCache(Duration = 60)]
+public IActionResult GetProducts()
+{
+    return Ok(_context.Products.ToList());
+}
+```
+
+The response can be cached for **60 seconds**.
+
+### How it works
+
+```text
+First Request
+Client → API → Database → Response
+                    ↓
+                  Cache
+
+Next Request
+Client → Cache → Response
+```
+
+### Common Properties
+
+```csharp
+[ResponseCache(
+    Duration = 60,
+    Location = ResponseCacheLocation.Any)]
+```
+
+| Property       | Purpose                                     |
+| -------------- | ------------------------------------------- |
+| `Duration`     | Cache duration in seconds                   |
+| `Location`     | Where response can be cached                |
+| `NoStore`      | Prevents caching                            |
+| `VaryByHeader` | Cache different responses based on a header |
+
+### `Location` Options
+
+```csharp
+ResponseCacheLocation.Any
+ResponseCacheLocation.Client
+ResponseCacheLocation.None
+```
+
+* **Any** → Client or intermediate/proxy cache can cache it.
+* **Client** → Only the client can cache it.
+* **None** → Prevents normal response caching.
+
+### Important
+
+Response caching follows **HTTP caching rules** and is primarily controlled through HTTP cache headers. It is **different from Output Caching**, which is a server-side ASP.NET Core caching mechanism.
+
+**Interview point:**
+
+> **Response Caching caches HTTP responses according to HTTP caching headers, whereas Output Caching allows ASP.NET Core to cache generated responses on the server.**
